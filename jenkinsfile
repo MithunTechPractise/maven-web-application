@@ -1,0 +1,35 @@
+node 
+{
+
+def mvnHome = tool name: 'maven3.8.5' // def is to define a variable, tool name: is the syntax to point to the software, maven3.8.5 is the name specified in global tool config
+
+stage('gitCheckout')
+{
+git branch: 'development', credentialsId: '86ff74cd-b392-4c8f-9e45-b4769510a9fe', url: 'https://github.com/MithunTechPractise/maven-web-application.git'
+}
+
+stage('build')
+{
+sh "$mvnHome/bin/mvn clean package"
+}//bin/mvn 'cos mvnHome only points to maven3.8.5 directory but mvn command is available in bin directory
+
+stage('generateSonarQubeReport')
+{
+sh "$mvnHome/bin/mvn clean sonar:sonar"
+}
+
+stage('deployToNexus')
+{
+sh "$mvnHome/bin/mvn clean deploy"
+}
+
+stage('deployToTomcat')
+{
+sshagent(['dc397790-fc78-4b7c-a6b1-b33cead1f1b7']) 
+{
+sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war bharadgs@192.168.0.199:/opt/apache-tomcat-9.0.59/webapps/"
+}
+}
+}
+
+// To generate a private key via for SSH connection, follow https://support.cloudbees.com/hc/en-us/articles/222978868-How-to-Connect-to-Remote-SSH-Agents-?page=67
