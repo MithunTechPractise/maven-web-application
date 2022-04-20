@@ -3,6 +3,9 @@ node
 
 def mvnHome = tool name: 'maven3.8.5' // def is to define a variable, tool name: is the syntax to point to the software, maven3.8.5 is the name specified in global tool config
 
+echo "This is a Scripted Pipeline Job: ${env.JOB_NAME}, Node: ${env.NODE_NAME}, BuildId: ${env.BUILD_ID}, Result: ${currentBuild.result}, Name: ${currentBuild.displayName} "
+
+
 stage('gitCheckout')
 {
 git branch: 'development', credentialsId: '86ff74cd-b392-4c8f-9e45-b4769510a9fe', url: 'https://github.com/MithunTechPractise/maven-web-application.git'
